@@ -10,21 +10,21 @@
 # ----------------------------------------------------------------------------------------
 # Import
 # ----------------------------------------------------------------------------------------
-import serial
+import importlib
 import sys
 import time
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # ----------------------------------------------------------------------------------------
 # PumpControl Class Definition
 # ----------------------------------------------------------------------------------------
-class PumpControl(QtGui.QWidget):
+class PumpControl(QtWidgets.QWidget):
     def __init__(self,
                  parameters = False,
                  parent = None):
 
         #Initialize parent class
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
 
         # Define internal attributes
         #self.com_port = parameters.get("pump_com_port")
@@ -35,11 +35,7 @@ class PumpControl(QtGui.QWidget):
         self.speed_units = "rpm"
 
         # Dynamic import of pump class
-        pump_module = __import__(parameters.get("pump_class", "pumps.rainin_rp1"),
-                                 globals(),
-                                 locals(),
-                                 [parameters.get("pump_class", "pumps.rainin_rp1")],
-                                 -1)
+        pump_module = importlib.import_module(parameters.get("pump_class", "storm_control.fluidics.pumps.rainin_rp1"))
 
         # Create Instance of Pump
         self.pump = pump_module.APump(parameters = parameters)
@@ -82,47 +78,47 @@ class PumpControl(QtGui.QWidget):
     # ------------------------------------------------------------------------------------ 
     def createGUI(self):
         # Define main widget
-        self.mainWidget = QtGui.QGroupBox()
+        self.mainWidget = QtWidgets.QGroupBox()
         self.mainWidget.setTitle("Pump Controls")
-        self.mainWidgetLayout = QtGui.QVBoxLayout(self.mainWidget)
+        self.mainWidgetLayout = QtWidgets.QVBoxLayout(self.mainWidget)
         
         # Add individual widgets
-        self.pump_identification_label = QtGui.QLabel()
+        self.pump_identification_label = QtWidgets.QLabel()
         self.pump_identification_label.setText("No Pump Attached")
 
-        self.flow_status_label= QtGui.QLabel()
+        self.flow_status_label= QtWidgets.QLabel()
         self.flow_status_label.setText("Flow Status:")
-        self.flow_status_display = QtGui.QLabel()
+        self.flow_status_display = QtWidgets.QLabel()
         self.flow_status_display.setText("Unknown")
         font = QtGui.QFont()
         font.setPointSize(20)
         self.flow_status_display.setFont(font)
 
-        self.speed_label = QtGui.QLabel()
+        self.speed_label = QtWidgets.QLabel()
         self.speed_label.setText("Flow Rate:")
-        self.speed_display = QtGui.QLabel()
+        self.speed_display = QtWidgets.QLabel()
         self.speed_display.setText("Unknown")
         font = QtGui.QFont()
         font.setPointSize(20)
         self.speed_display.setFont(font)
 
-        self.speed_control_label = QtGui.QLabel()
+        self.speed_control_label = QtWidgets.QLabel()
         self.speed_control_label.setText("Desired Speed")
-        self.speed_control_entry_box = QtGui.QLineEdit()
+        self.speed_control_entry_box = QtWidgets.QLineEdit()
         self.speed_control_entry_box.setText("10.00")
         self.speed_control_entry_box.editingFinished.connect(self.coerceSpeed)
                
-        self.direction_control_label = QtGui.QLabel()
+        self.direction_control_label = QtWidgets.QLabel()
         self.direction_control_label.setText("Desired Direction")
-        self.direction_control = QtGui.QComboBox()
+        self.direction_control = QtWidgets.QComboBox()
         self.direction_control.addItem("Forward")
         self.direction_control.addItem("Reverse")
 
-        self.start_flow_button = QtGui.QPushButton()
+        self.start_flow_button = QtWidgets.QPushButton()
         self.start_flow_button.setText("Start Flow")
         self.start_flow_button.clicked.connect(self.handleStartFlow)
 
-        self.stop_flow_button = QtGui.QPushButton()
+        self.stop_flow_button = QtWidgets.QPushButton()
         self.stop_flow_button.setText("Stop Flow")
         self.stop_flow_button.clicked.connect(self.handleStopFlow)
         
@@ -135,7 +131,7 @@ class PumpControl(QtGui.QWidget):
         self.mainWidgetLayout.addWidget(self.start_flow_button)
         self.mainWidgetLayout.addWidget(self.stop_flow_button)
         self.mainWidgetLayout.addStretch(1)
-        
+
     # ----------------------------------------------------------------------------------------
     # Display Status
     # ----------------------------------------------------------------------------------------
@@ -207,7 +203,7 @@ class PumpControl(QtGui.QWidget):
 # ----------------------------------------------------------------------------------------
 # Stand Alone Test Class
 # ----------------------------------------------------------------------------------------
-class StandAlone(QtGui.QMainWindow):
+class StandAlone(QtWidgets.QMainWindow):
     def __init__(self, parent = None):
         super(StandAlone, self).__init__(parent)
 
@@ -251,8 +247,8 @@ class StandAlone(QtGui.QMainWindow):
 # ----------------------------------------------------------------------------------------
 # Test/Demo of Classs
 # ----------------------------------------------------------------------------------------        
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+if (__name__ == "__main__"):
+    app = QtWidgets.QApplication(sys.argv)
     window = StandAlone()
     window.show()
-    app.exec_()    
+    app.exec_()

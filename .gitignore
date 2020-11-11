@@ -2,6 +2,21 @@
 ## log-files
 #################
 *.log
+*.out*
+
+##############
+## data files
+##############
+*.dax
+*.inf
+*.off
+*.power
+/storm_control/test/data/*.xml
+
+##############
+## camera offset files
+##############
+cam_offsets_*.txt
 
 ############
 ## Windows
@@ -12,6 +27,15 @@ Thumbs.db
 
 # Folder config file
 Desktop.ini
+
+#####
+## C
+#####
+*.a
+*.o
+*.so
+*.so.*
+*.os
 
 #############
 ## Python
@@ -59,3 +83,4 @@ proguard/
 
 # Metadata
 .metadata
+

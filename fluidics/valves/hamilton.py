@@ -5,21 +5,24 @@
 # Jeff Moffitt
 # 12/17/13
 # jeffmoffitt@gmail.com
+#
+# TODO: Simulated port should be in a different class
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
 # Import
 # ----------------------------------------------------------------------------------------
-import serial
 import sys
 import time
+
+from storm_control.fluidics.valves.valve import AbstractValve
 
 # ----------------------------------------------------------------------------------------
 # HamiltonMVP Class Definition
 # ----------------------------------------------------------------------------------------
-class HamiltonMVP():
+class HamiltonMVP(AbstractValve):
     def __init__(self,
-                 com_port = 2,
+                 com_port = "COM2",
                  num_simulated_valves = 0,
                  verbose = False):
 
@@ -35,12 +38,13 @@ class HamiltonMVP():
         
         # Create serial port (if not in simulation mode)
         if not self.simulate:
+            import serial
             self.serial = serial.Serial(port = self.com_port, 
-                                 baudrate = 9600, 
-                                 bytesize = serial.SEVENBITS, 
-                                 parity = serial.PARITY_ODD, 
-                                 stopbits = serial.STOPBITS_ONE, 
-                                 timeout = 0.1)
+                                        baudrate = 9600, 
+                                        bytesize = serial.SEVENBITS, 
+                                        parity = serial.PARITY_ODD, 
+                                        stopbits = serial.STOPBITS_ONE, 
+                                        timeout = 0.1)
         
         # Define important serial characters
         self.acknowledge = "\x06"
@@ -349,7 +353,7 @@ class HamiltonMVP():
     # Read from Serial Port
     # ------------------------------------------------------------------------------------
     def read(self):
-        response = self.serial.read(self.read_length)
+        response = self.serial.read(self.read_length).decode()
         if self.verbose:
             print("Received: " + str((response, "")))
         return response
@@ -417,14 +421,14 @@ class HamiltonMVP():
     # Write to Serial Port
     # ------------------------------------------------------------------------------------    
     def write(self, message):
-        self.serial.write(message)
+        self.serial.write(message.encode())
         if self.verbose:
             print("Wrote: " + message[:-1]) # Display all but final carriage return
 
 # ----------------------------------------------------------------------------------------
 # Test/Demo of Classs
 # ----------------------------------------------------------------------------------------
-if __name__ == '__main__':
+if (__name__ == '__main__'):
     hamilton = HamiltonMVP(verbose = True)
 
     for valve_ID in range(hamilton.howManyValves()):

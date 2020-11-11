@@ -13,44 +13,55 @@
 # Import
 # ----------------------------------------------------------------------------------------
 import sys
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from valves.qtValveControl import QtValveControl
 from valves.hamilton import HamiltonMVP
-
 from valves.autopicker import MockAutopicker
 from valves.autopicker_cnc import CNC
 from valves.autopicker_xyz import XYZ
 
+
 # ----------------------------------------------------------------------------------------
 # ValveChain Class Definition
 # ----------------------------------------------------------------------------------------
-class ValveChain(QtGui.QWidget):
+class ValveChain(QtWidgets.QWidget):
     def __init__(self,
                  parent = None,
-                 com_port = 2,
+                 com_port = "COM2",
                  num_simulated_valves = 0,
                  usb_cnc = False,
+                 valve_type = 'Hamilton',    # note Hamilton is still the default
                  verbose = False
                  ):
 
         # Initialize parent class
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
 
         # Define local attributes
         self.com_port = com_port
         self.verbose = verbose
         self.poll_time = 2000
 
-        # Create instance of Hamilton class
-        if self.com_port < 0 or num_simulated_valves > 0:
+        # Create instance of Valve class
+        print(valve_type)
+        if valve_type == 'Simulated' or self.com_port < 0 or num_simulated_valves > 0:
             print('simulating valves')
-            self.valve_chain = HamiltonMVP(com_port = -1,
-                                           num_simulated_valves = num_simulated_valves,
-                                           verbose = self.verbose)
-        else:
+            self.valve_chain = HamiltonMVP(com_port = 0,
+				   num_simulated_valves = num_simulated_valves,
+				   verbose = self.verbose)
+
+        elif valve_type == 'Hamilton':	
             self.valve_chain = HamiltonMVP(com_port = self.com_port,
                                            verbose = self.verbose)
 
+        elif valve_type == 'Titan':
+            self.valve_chain = TitanValve(com_port = self.com_port,
+                    verbose = self.verbose)
+        
+        elif valve_type == 'None':
+            print('no valves')
+            self.valve_chain = None
+            
         if usb_cnc:
             if isinstance(usb_cnc, tuple) or isinstance(usb_cnc, list):
                 self.cnc = CNC(usb_cnc[0], usb_cnc[1])
@@ -62,6 +73,7 @@ class ValveChain(QtGui.QWidget):
                 self.cnc = CNC()
         else:
             self.cnc = None
+                    
 
         # Create QtValveControl widgets for each valve in the chain
         self.num_valves = self.valve_chain.howManyValves()
@@ -96,7 +108,7 @@ class ValveChain(QtGui.QWidget):
             text_string = "Changing Valve " + str(valve_ID)
             text_string += " Port " + str(port_ID)
             text_string += " Direction " + str(rotation_direction)
-            print(text_string )
+            print(text_string)
         
         if valve_ID >= 0 and valve_ID < self.num_valves:
             if port_ID == None:
@@ -127,9 +139,9 @@ class ValveChain(QtGui.QWidget):
     # ------------------------------------------------------------------------------------  
     def createGUI(self):
         # Define display widget
-        self.valveChainGroupBox = QtGui.QGroupBox()
+        self.valveChainGroupBox = QtWidgets.QGroupBox()
         self.valveChainGroupBox.setTitle("Valve Controls")
-        self.valveChainGroupBoxLayout = QtGui.QVBoxLayout(self.valveChainGroupBox)
+        self.valveChainGroupBoxLayout = QtWidgets.QVBoxLayout(self.valveChainGroupBox)
 
         for valve_ID in range(self.num_valves):
             valve_widget = QtValveControl(self,
@@ -168,7 +180,7 @@ class ValveChain(QtGui.QWidget):
         self.mainWidget = self.valveChainGroupBox
 
         # Define menu items
-        self.valve_reset_action = QtGui.QAction("Valve Chain Reset", self)
+        self.valve_reset_action = QtWidgets.QAction("Valve Chain Reset", self)
         self.valve_reset_action.triggered.connect(self.reinitializeChain)
 
         self.menu_names = ["Valve"]
@@ -217,7 +229,7 @@ class ValveChain(QtGui.QWidget):
 # ----------------------------------------------------------------------------------------
 # Stand Alone Test Class
 # ----------------------------------------------------------------------------------------
-class StandAlone(QtGui.QMainWindow):
+class StandAlone(QtWidgets.QMainWindow):
     def __init__(self, parent = None):
         super(StandAlone, self).__init__(parent)
 
@@ -227,8 +239,8 @@ class StandAlone(QtGui.QMainWindow):
                                       num_simulated_valves = 2)
         
         # central widget
-        self.centralWidget = QtGui.QWidget()
-        self.mainLayout = QtGui.QVBoxLayout(self.centralWidget)
+        self.centralWidget = QtWidgets.QWidget()
+        self.mainLayout = QtWidgets.QVBoxLayout(self.centralWidget)
         self.mainLayout.addWidget(self.valve_chain.mainWidget)
         
         # set central widget
@@ -244,7 +256,7 @@ class StandAlone(QtGui.QMainWindow):
         menubar = self.menuBar()
         file_menu = menubar.addMenu("File")
 
-        exit_action = QtGui.QAction("Exit", self)
+        exit_action = QtWidgets.QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.closeEvent)
 
@@ -260,8 +272,8 @@ class StandAlone(QtGui.QMainWindow):
 # ----------------------------------------------------------------------------------------
 # Test/Demo of Classs
 # ----------------------------------------------------------------------------------------        
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+if (__name__ == "__main__"):
+    app = QtWidgets.QApplication(sys.argv)
     window = StandAlone()
     window.show()
     app.exec_()                              

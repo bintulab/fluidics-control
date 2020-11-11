@@ -13,12 +13,12 @@
 import sys
 import os
 import xml.etree.ElementTree as elementTree
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # ----------------------------------------------------------------------------------------
 # PumpCommands Class Definition
 # ----------------------------------------------------------------------------------------
-class PumpCommands(QtGui.QMainWindow):
+class PumpCommands(QtWidgets.QMainWindow):
 
     # Define custom signal
     change_command_signal = QtCore.pyqtSignal(str)
@@ -46,30 +46,30 @@ class PumpCommands(QtGui.QMainWindow):
     # Create display and control widgets
     # ------------------------------------------------------------------------------------
     def close(self):
-        if self.verbose: print "Closing pump commands"
+        if self.verbose: print("Closing pump commands")
 
     # ------------------------------------------------------------------------------------
     # Create display and control widgets
     # ------------------------------------------------------------------------------------
     def createGUI(self):
-        self.mainWidget = QtGui.QGroupBox()
+        self.mainWidget = QtWidgets.QGroupBox()
         self.mainWidget.setTitle("Pump Commands")
-        self.mainWidgetLayout = QtGui.QVBoxLayout(self.mainWidget)
+        self.mainWidgetLayout = QtWidgets.QVBoxLayout(self.mainWidget)
 
-        self.fileLabel = QtGui.QLabel()
+        self.fileLabel = QtWidgets.QLabel()
         self.fileLabel.setText("")
 
-        self.commandListWidget = QtGui.QListWidget()
+        self.commandListWidget = QtWidgets.QListWidget()
         self.commandListWidget.currentItemChanged.connect(self.updateCommandDisplay)
         
-        self.sendCommandButton = QtGui.QPushButton("Send Command")
+        self.sendCommandButton = QtWidgets.QPushButton("Send Command")
         self.sendCommandButton.clicked.connect(self.transmitCommandIndex)
 
-        self.currentCommandGroupBox = QtGui.QGroupBox()
+        self.currentCommandGroupBox = QtWidgets.QGroupBox()
         self.currentCommandGroupBox.setTitle("Current Command")
-        self.currentCommandGroupBoxLayout = QtGui.QVBoxLayout(self.currentCommandGroupBox)
+        self.currentCommandGroupBoxLayout = QtWidgets.QVBoxLayout(self.currentCommandGroupBox)
 
-        self.currentCommandLabel = QtGui.QLabel()
+        self.currentCommandLabel = QtWidgets.QLabel()
         self.currentCommandLabel.setText("")
         self.currentCommandGroupBoxLayout.addWidget(self.currentCommandLabel)
 
@@ -81,11 +81,11 @@ class PumpCommands(QtGui.QMainWindow):
         self.mainWidgetLayout.addStretch(1)
 
         # Menu items (may not be used)
-        self.exit_action = QtGui.QAction("Exit", self)
+        self.exit_action = QtWidgets.QAction("Exit", self)
         self.exit_action.setShortcut("Ctrl+Q")
         self.exit_action.triggered.connect(self.closeEvent)
 
-        self.load_commands_action = QtGui.QAction("Load New Commands", self)
+        self.load_commands_action = QtWidgets.QAction("Load New Commands", self)
         self.load_commands_action.triggered.connect(self.loadCommands)
         self.load_commands_action_menu_name = "File"
 
@@ -96,7 +96,7 @@ class PumpCommands(QtGui.QMainWindow):
         try:
             return self.commands[command_ID]
         except:
-            print "Invalvid command index: " + command_ID
+            print("Invalvid command index: " + command_ID)
             return [-1]*self.num_valves # return default
 
     # ------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ class PumpCommands(QtGui.QMainWindow):
             command_ID = self.command_names.index(command_name)
             return self.commands[command_ID]
         except:
-            print "Did not find " + command_name
+            print("Did not find " + command_name)
             return [-1]*self.num_valves # Return no change command
 
     # ------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ class PumpCommands(QtGui.QMainWindow):
             xml_file_path = QtGui.QFileDialog.getOpenFileName(self, "Open File", "\home")
             if not os.path.isfile(xml_file_path):
                 xml_file_path = "default_config.xml"
-                print "Not a valid path. Restoring: " + xml_file_path
+                print("Not a valid path. Restoring: " + xml_file_path)
         self.file_name = xml_file_path
         
         # Parse XML
@@ -150,11 +150,11 @@ class PumpCommands(QtGui.QMainWindow):
     def parseCommandXML(self):
         # Try loading file
         try:
-            print "Parsing for commands: " + self.file_name
+            print("Parsing for commands: " + self.file_name)
             self.xml_tree = elementTree.parse(self.file_name)
             self.kilroy_configuration = self.xml_tree.getroot()
         except:
-            print "Valid xml file not loaded"
+            print("Valid xml file not loaded")
             return
 
         # Clear previous commands
@@ -165,7 +165,7 @@ class PumpCommands(QtGui.QMainWindow):
         # Load number of valves
         self.num_pumps = int(self.kilroy_configuration.get("num_pumps"))
         if not (self.num_pumps>0):
-            print "Number of pumps not specified"
+            print("Number of pumps not specified")
         
         # Load commands
         for pump_command in self.kilroy_configuration.findall("pump_commands"):
@@ -190,14 +190,14 @@ class PumpCommands(QtGui.QMainWindow):
     # Display loaded commands
     # ------------------------------------------------------------------------------------                
     def printCommands(self):
-        print "Current commands:"
+        print("Current commands:")
         for command_ID in range(self.num_commands):
-            print self.command_names[command_ID]
+            print(self.command_names[command_ID])
             direction = self.commands[command_ID][0]
             speed = self.commands[command_ID][1]
             text_string = "    " + "Flow Direction: " + direction + "\n"
             text_string += "    " + "Speed: " + str(speed) +"\n"
-            print text_string
+            print(text_string)
 
     # ------------------------------------------------------------------------------------
     # Update active command on GUI
@@ -252,7 +252,7 @@ class PumpCommands(QtGui.QMainWindow):
 # ----------------------------------------------------------------------------------------
 # Stand Alone Test Class
 # ----------------------------------------------------------------------------------------
-class StandAlone(QtGui.QMainWindow):
+class StandAlone(QtWidgets.QMainWindow):
     def __init__(self, parent = None):
         super(StandAlone, self).__init__(parent)
 
@@ -298,8 +298,8 @@ class StandAlone(QtGui.QMainWindow):
 # ----------------------------------------------------------------------------------------
 # Test/Demo of Classs
 # ----------------------------------------------------------------------------------------                
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+if (__name__ == "__main__"):
+    app = QtWidgets.QApplication(sys.argv)
     window = StandAlone()
     window.show()
     sys.exit(app.exec_())

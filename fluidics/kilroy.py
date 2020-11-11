@@ -17,17 +17,17 @@ imp.load_source("setPath", "../sc_library/setPath.py")
 import sys
 import os
 import time
-from PyQt4 import QtCore, QtGui
-from valves.valveChain import ValveChain
-from pumps.pumpControl import PumpControl
-from kilroyProtocols import KilroyProtocols
-from sc_library.tcpServer import TCPServer
-import sc_library.parameters as params
+from PyQt5 import QtCore, QtGui, QtWidgets
+from storm_control.fluidics.valves.valveChain import ValveChain
+from storm_control.fluidics.pumps.pumpControl import PumpControl
+from storm_control.fluidics.kilroyProtocols import KilroyProtocols
+from storm_control.sc_library.tcpServer import TCPServer
+import storm_control.sc_library.parameters as params
 
 # ----------------------------------------------------------------------------------------
 # Kilroy Class Definition
 # ----------------------------------------------------------------------------------------
-class Kilroy(QtGui.QMainWindow):
+class Kilroy(QtWidgets.QMainWindow):
     def __init__(self, parameters):
         super(Kilroy, self).__init__()
 
@@ -37,18 +37,29 @@ class Kilroy(QtGui.QMainWindow):
         self.tcp_port = parameters.get("tcp_port")
         self.pump_com_port = parameters.get("pump_com_port", default=-1)
         self.pump_ID = parameters.get("pump_ID", default="")
+        
+        # populate default values if missing
+        #   note the different way parameters is polled
         if not "num_simulated_valves" in parameters.parameters:
             self.num_simulated_valves = 0
         else:
             self.num_simulated_valves = parameters.get("num_simulated_valves")
+            
+        if not parameters.has("valve_type"):
+            self.valve_type = 'Hamilton'
+        else:
+            self.valve_type = parameters.get("valve_type")
+            
         if not "protocols_file" in parameters.parameters:
             self.protocols_file = "default_config.xml"
         else:
             self.protocols_file = parameters.get("protocols_file")
+          
         if not "commands_file" in parameters.parameters:
             self.commands_file = "default_config.xml"
         else:
             self.commands_file = parameters.get("commands_file")
+            
         if not "simulate_pump" in parameters.parameters:
             self.simulate_pump = False
         else:
@@ -69,6 +80,7 @@ class Kilroy(QtGui.QMainWindow):
         self.valveChain = ValveChain(com_port = self.valve_com_port,
                                      num_simulated_valves = self.num_simulated_valves,
                                      usb_cnc = self.usb_cnc,
+                                     valve_type=self.valve_type,
                                      verbose = self.verbose)
 
         # Create PumpControl instance
@@ -107,7 +119,7 @@ class Kilroy(QtGui.QMainWindow):
     # Create master GUI
     # ----------------------------------------------------------------------------------------
     def createGUI(self):
-        self.mainLayout = QtGui.QGridLayout()
+        self.mainLayout = QtWidgets.QGridLayout()
         self.mainLayout.addWidget(self.kilroyProtocols.mainWidget, 0, 0, 2, 2)
         self.mainLayout.addWidget(self.kilroyProtocols.valveCommands.mainWidget, 2, 0, 1, 1)
         self.mainLayout.addWidget(self.kilroyProtocols.pumpCommands.mainWidget, 2, 1, 1, 1)
@@ -172,7 +184,7 @@ class Kilroy(QtGui.QMainWindow):
 # ----------------------------------------------------------------------------------------
 # Stand Alone Kilroy Class
 # ----------------------------------------------------------------------------------------                                                                   
-class StandAlone(QtGui.QMainWindow):
+class StandAlone(QtWidgets.QMainWindow):
     def __init__(self, parameters, parent = None):
         super(StandAlone, self).__init__(parent)
 
@@ -180,7 +192,7 @@ class StandAlone(QtGui.QMainWindow):
         self.kilroy = Kilroy(parameters)
                                           
         # central widget
-        self.centralWidget = QtGui.QWidget()
+        self.centralWidget = QtWidgets.QWidget()
         self.centralWidget.setLayout(self.kilroy.mainLayout)
 
         # This is for handling file drops.
@@ -198,7 +210,7 @@ class StandAlone(QtGui.QMainWindow):
         self.setGeometry(50, 50, 1200, 800)
 
         # Define close menu item
-        exit_action = QtGui.QAction("Exit", self)
+        exit_action = QtWidgets.QAction("Exit", self)
         exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.close)
 
@@ -227,7 +239,7 @@ class StandAlone(QtGui.QMainWindow):
     # ----------------------------------------------------------------------------------------
     def dropEvent(self, event):
         for url in event.mimeData().urls():
-            self.kilroy.kilroyProtocols.loadFullConfiguration(xml_file_path = str(url.encodedPath())[1:])
+            self.kilroy.kilroyProtocols.loadFullConfiguration(xml_file_path = str(url.path())[1:])
 
     # ----------------------------------------------------------------------------------------
     # Handle close event
@@ -240,11 +252,11 @@ class StandAlone(QtGui.QMainWindow):
 # Runtime code: Kilroy is meant to be run as a stand alone
 # ----------------------------------------------------------------------------------------                                
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
     # Show splash screen (to allow for valve initialization)
     splash_pix = QtGui.QPixmap("kilroy_splash.jpg")
-    splash = QtGui.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    splash = QtWidgets.QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
     app.processEvents()
