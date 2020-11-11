@@ -1,8 +1,0 @@
-
-QFrame {
-    background-color : rgb(128,128,128);
-}
-
-QLabel {
-    color : rgb(200,200,200);
-}

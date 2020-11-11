@@ -1,1 +1,0 @@
-activate Hal3 && python hal4000.py xml/scope2_confocal_pcam_coherent_config.xml
