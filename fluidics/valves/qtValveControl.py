@@ -14,7 +14,8 @@
 # ----------------------------------------------------------------------------------------
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from valves.ui_layouts.ui_qt_valve import Ui_QtValveControlWidget as uiQtValve # my merge
+import valves.ui_layouts.ui_qt_valve as uiQtValve
+#   from valves.ui_layouts.ui_qt_valve import Ui_QtValveControlWidget as uiQtValve # my merge - does not work
 # from valves.ui_layouts.ui_qt_valve import QtValveControlWidget # original 27
 # import storm_control.fluidics.valves.ui_layouts.ui_qt_valve as uiQtValve # 34
 

@@ -3,7 +3,8 @@
   <!-- Valve parameters -->
   <valve_type type="string">Simulated</valve_type>
   <valves_com_port type="string">COM2</valves_com_port>	<!-- COM port of serial connection to valves -->  
-  <num_simulated_valves type="int">3</num_simulated_valves><!-- Number of valves to simulate (Defaults to 0) -->
+  <num_simulated_valves type="int">1</num_simulated_valves><!-- Number of valves to simulate (Defaults to 0) -->
+  <cnc type="string">XYZ</cnc><!-- Look for a CNC -->
 
   <!-- Pump parameters -->
   <pump_class type="string">pumps.rainin_rp1</pump_class> <!--  pumps.gilson_mp3 Control class for pump -->

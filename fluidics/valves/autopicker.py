@@ -57,11 +57,11 @@ class MockAutopicker(object):
             self.set(p)
 
     def coords(self, add_offset=True):
-        print "MockCNC queried for position = ", self.position
+        print("MockCNC queried for position = ", self.position)
         return self.position
 
     def set(self, position):
-        print "MockCNC setting position to", position
+        print("MockCNC setting position to", position)
         self.position = list(position)
 
     def move(self, port, direction):
@@ -146,19 +146,19 @@ class Plate(object):
             self.interpolation = [matplotlib.tri.LinearTriInterpolator(self.triangulation, coord) for coord in zip(*coords)]
             #self.interpolation = [matplotlib.tri.CubicTriInterpolator(self.triangulation, coord) for coord in zip(*coords)]
         else:
-            raise Exception, "Can't freeze positions with two or fewer!"
+            raise Exception("Can't freeze positions with two or fewer!")
         
     def find_position(self, x=0, y=0):
         if len(self.positions) == 1:
             return numpy.array(self.positions[0][2])
         elif len(self.positions) > 2:
             if self.interpolation is None:
-                print "Interpolator undefined, attempting to freeze positions matrix..."
+                print("Interpolator undefined, attempting to freeze positions matrix...")
                 self.freeze()
             return numpy.array([interp(x, y) for interp in self.interpolation])
         else:
             # In theory you could support interpolation here
-            raise Exception, "Can't find position if there are exactly two!"
+            raise Exception("Can't find position if there are exactly two!")
 
     def move(self, x=0, y=0):
         target_position = self.find_position(x, y)

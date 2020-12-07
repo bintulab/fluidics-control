@@ -29,18 +29,23 @@ class ValveChain(QtWidgets.QWidget):
                  parent = None,
                  com_port = "COM2",
                  num_simulated_valves = 0,
-                 usb_cnc = False,
-                 valve_type = 'Hamilton',    # note Hamilton is still the default
+                 usb_cnc = 'XYZ',
+                 valve_type = 'Hamilton',   
                  verbose = False
-                 ):
+                 ):   # note Hamilton is still the default
 
         # Initialize parent class
         QtWidgets.QWidget.__init__(self, parent)
 
         # Define local attributes
         self.com_port = com_port
+        self.usb_cnc = usb_cnc
         self.verbose = verbose
         self.poll_time = 2000
+        print('usb cnc: ')
+        print(usb_cnc)
+
+        print('setting up valve chain')
 
         # Create instance of Valve class
         print(valve_type)
@@ -61,18 +66,19 @@ class ValveChain(QtWidgets.QWidget):
         elif valve_type == 'None':
             print('no valves')
             self.valve_chain = None
-            
-        if usb_cnc:
-            if isinstance(usb_cnc, tuple) or isinstance(usb_cnc, list):
-                self.cnc = CNC(usb_cnc[0], usb_cnc[1])
-            elif usb_cnc == "simulated":
-                self.cnc = MockAutopicker()
-            elif usb_cnc == "XYZ":
-                self.cnc = XYZ()
-            else:
-                self.cnc = CNC()
-        else:
+        
+        if usb_cnc == None:
             self.cnc = None
+        elif usb_cnc == 'XYZ':
+            self.cnc = XYZ()
+            print('CNC is XYZ minimover')
+        elif usb_cnc == 'CNC':
+            self.cnc = CNC()
+        elif usb_cnc == 'simulated':
+            self.cnc = MockAutopicker()
+        else:
+            cnc_vendor_product = usb_cnc.split(",")
+            self.cnc = CNC(cnc_vendor_product[0], cnc_vendor_product[1])
                     
 
         # Create QtValveControl widgets for each valve in the chain

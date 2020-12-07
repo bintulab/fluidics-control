@@ -1,8 +1,10 @@
 import usb
 import crccheck
-import autopicker
+from valves.autopicker import MockAutopicker
+# import autopicker
 
-class CNC(autopicker.MockAutopicker):
+# class CNC(autopicker.MockAutopicker):
+class CNC(MockAutopicker):
     def __init__(self, idVendor=0x2121, idProduct=0x2130, configuration=(0,0)):
         self.status = ("Initializing", False)
         # self.dev = usb.core.find(idVendor=idVendor, idProduct=idProduct)
@@ -28,7 +30,7 @@ class CNC(autopicker.MockAutopicker):
             self.restore_config(r"./valves/VWR_Plate_Lid.json")
 
         else:
-            raise Exception, "Can't find device with vendor %0d and product %0d!" % (idVendor, idProduct)
+            raise Exception("Can't find device with vendor %0d and product %0d!" % (idVendor, idProduct))
 
     def send(self, msg):
         assert len(msg) == 64
@@ -48,7 +50,7 @@ class CNC(autopicker.MockAutopicker):
         
         if position[0] is None:
             position = (current_position[0],current_position[1],-180) # changed -60 to -180
-        print position
+        print(position)
         self.send(cnc_commands.cmd_set_offset(current_position[0]-position[0], current_position[1]-position[1], current_position[2]-position[2]))
         self.wait()
 

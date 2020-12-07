@@ -18,10 +18,10 @@ import sys
 import os
 import time
 from PyQt5 import QtCore, QtGui, QtWidgets
-from storm_control.fluidics.valves.valveChain import ValveChain
-from storm_control.fluidics.pumps.pumpControl import PumpControl
-from storm_control.fluidics.kilroyProtocols import KilroyProtocols
-from storm_control.sc_library.tcpServer import TCPServer
+from valves.valveChain import ValveChain
+from pumps.pumpControl import PumpControl
+from kilroyProtocols import KilroyProtocols
+from storm_control.sc_library.tcpServer import TCPServer   # get these from storm control
 import storm_control.sc_library.parameters as params
 
 # ----------------------------------------------------------------------------------------
@@ -66,9 +66,9 @@ class Kilroy(QtWidgets.QMainWindow):
             self.simulate_pump = parameters.get("simulate_pump")
 
         if not "cnc" in parameters.parameters:
-            self.usb_cnc = False
+            self.usb_cnc = None
         else:
-            self.usb_cnc = True if isinstance(parameters.get("cnc"), bool) else parameters.get("cnc").split(",")
+            self.usb_cnc = parameters.get("cnc")
 
         if "simulate_cnc" in parameters.parameters and parameters.get("simulate_cnc"):
             self.usb_cnc = "simulated"
@@ -77,11 +77,13 @@ class Kilroy(QtWidgets.QMainWindow):
         self.received_message = None
         
         # Create ValveChain instance
+        print(self.valve_com_port)
         self.valveChain = ValveChain(com_port = self.valve_com_port,
                                      num_simulated_valves = self.num_simulated_valves,
-                                     usb_cnc = self.usb_cnc,
                                      valve_type=self.valve_type,
+                                     usb_cnc = self.usb_cnc,
                                      verbose = self.verbose)
+                                     #                                      
 
         # Create PumpControl instance
         self.pumpControl = PumpControl(parameters = parameters)
