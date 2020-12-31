@@ -6,6 +6,11 @@
 # Jeff Moffitt
 # 12/28/13
 # jeffmoffitt@gmail.com
+#
+# With amendments by Nasa Sinnott-Armstrong and Alistair Boettiger
+# updated to CNC and python 3
+# 12/30/20  
+# boettiger@stanford.edu 
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
@@ -53,6 +58,7 @@ class ValveCommands(QtWidgets.QMainWindow):
     # Create display and control widgets
     # ------------------------------------------------------------------------------------
     def createGUI(self):
+        print('setting up valve command GUI')
         self.mainWidget = QtWidgets.QGroupBox()
         self.mainWidget.setTitle("Valve Commands")
         self.mainWidgetLayout = QtWidgets.QVBoxLayout(self.mainWidget)
@@ -97,7 +103,7 @@ class ValveCommands(QtWidgets.QMainWindow):
         try:
             return self.commands[command_ID]
         except:
-            print("Invalvid command index: " + command_ID)
+            print("Invalid command index: " + command_ID)
             return [-1]*self.num_valves # return default
 
     # ------------------------------------------------------------------------------------
@@ -156,6 +162,7 @@ class ValveCommands(QtWidgets.QMainWindow):
     # Parse the command xml file
     # ------------------------------------------------------------------------------------        
     def parseCommandXML(self):
+        print('called parsing valve commands')
         # Try loading file
         try:
             print("Parsing for commands: " + self.file_name)
@@ -165,6 +172,7 @@ class ValveCommands(QtWidgets.QMainWindow):
             print("Valid xml file not loaded")
             return
 
+        
         # Clear previous commands
         self.command_names = []
         self.commands = []
@@ -178,8 +186,11 @@ class ValveCommands(QtWidgets.QMainWindow):
         self.cnc = bool(self.kilroy_configuration.get("cnc", False))
 
         # Load commands
+        print('parsing valve commands now')
         for valve_command in self.kilroy_configuration.findall("valve_commands"):
+            # print(valve_command)
             command_list = valve_command.findall("valve_cmd")
+            # print(command_list)
             for command in command_list:
                 new_command = [-1]*(self.num_valves + self.cnc) # make copy to initialize config with default
                 for valve_pos in command.findall("valve_pos"):
@@ -195,7 +206,12 @@ class ValveCommands(QtWidgets.QMainWindow):
                     port_ID = int(cnc_pos.get("port_ID")) - 1
                     plate_ID = cnc_pos.get("plate_ID")
                     new_command[valve_ID] = (plate_ID, port_ID)
-
+                    '''
+                    print("plate_ID")
+                    print(plate_ID)
+                    print("port_ID")
+                    print(port_ID)
+                    '''
                 # Add command
                 self.commands.append(new_command)
                 self.command_names.append(command.get("name"))
@@ -300,6 +316,7 @@ class StandAlone(QtWidgets.QMainWindow):
         super(StandAlone, self).__init__(parent)
 
         # scroll area widget contents - layout
+        print('calling ValveCommands')
         self.valve_chain_commands = ValveCommands(verbose = True)
         
         # main layout

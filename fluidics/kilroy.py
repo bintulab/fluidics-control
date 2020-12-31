@@ -44,12 +44,12 @@ class Kilroy(QtWidgets.QMainWindow):
             self.num_simulated_valves = 0
         else:
             self.num_simulated_valves = parameters.get("num_simulated_valves")
-            
+  
         if not parameters.has("valve_type"):
             self.valve_type = 'Hamilton'
         else:
             self.valve_type = parameters.get("valve_type")
-            
+  
         if not "protocols_file" in parameters.parameters:
             self.protocols_file = "default_config.xml"
         else:

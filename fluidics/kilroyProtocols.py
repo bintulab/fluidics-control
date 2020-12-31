@@ -17,8 +17,8 @@ import sys
 import os
 import xml.etree.ElementTree as elementTree
 from PyQt5 import QtCore, QtGui, QtWidgets
-from storm_control.fluidics.valves.valveCommands import ValveCommands
-from storm_control.fluidics.pumps.pumpCommands import PumpCommands
+from valves.valveCommands import ValveCommands  # storm_control.fluidics.
+from pumps.pumpCommands import PumpCommands  #  storm_control.fluidics.
 
 # ----------------------------------------------------------------------------------------
 # KilroyProtocols Class Definition
@@ -51,11 +51,13 @@ class KilroyProtocols(QtWidgets.QMainWindow):
         print("----------------------------------------------------------------------")
         
         # Create instance of ValveCommands class
+        print('creating valveCommands')
         self.valveCommands = ValveCommands(xml_file_path = self.command_xml_path,
                                            verbose = self.verbose)
 
         # Connect valve command issue signal
         self.valveCommands.change_command_signal.connect(self.issueValveCommand)
+        print(self.issueValveCommand)
 
         # Create instance of PumpCommands class
         self.pumpCommands = PumpCommands(xml_file_path = self.command_xml_path,
@@ -289,6 +291,7 @@ class KilroyProtocols(QtWidgets.QMainWindow):
         self.command_xml_path = xml_file_path
 
         # Update valveCommands
+        print('updating valve commands')
         self.valveCommands.loadCommands(xml_file_path = self.command_xml_path)
 
         # Update pumpCommands
@@ -474,7 +477,10 @@ class KilroyProtocols(QtWidgets.QMainWindow):
         
         # Unselect all
         self.protocolDetailsList.setCurrentRow(0)
-        self.protocolDetailsList.item(0).setSelected(False)
+        try:
+            self.protocolDetailsList.item(0).setSelected(False)
+        except:
+            print('unselect all failed')
     
         # Stop timers
         self.poll_elapsed_time_timer.stop()

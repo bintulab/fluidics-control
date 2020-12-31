@@ -150,6 +150,7 @@ class ValveChain(QtWidgets.QWidget):
         self.valveChainGroupBoxLayout = QtWidgets.QVBoxLayout(self.valveChainGroupBox)
 
         for valve_ID in range(self.num_valves):
+            print('setting up valves')
             valve_widget = QtValveControl(self,
                                          ID = valve_ID)
             self.valve_names.append(str(valve_ID + 1)) # Save valve name
@@ -166,6 +167,7 @@ class ValveChain(QtWidgets.QWidget):
             self.valveChainGroupBoxLayout.addWidget(valve_widget)
 
         if self.cnc is not None:
+            print('setting up cnc')
             cnc_widget = QtValveControl(self, ID = -2)
             cnc_widget.setValveName("CNC") # Valve names are +1 valve IDs
             cnc_widget.setValveConfiguration(self.cnc.get_configuration())
@@ -212,7 +214,15 @@ class ValveChain(QtWidgets.QWidget):
     # ------------------------------------------------------------------------------------          
     def receiveCommand(self, command):
         for valve_ID, port_ID in enumerate(command):
-            if port_ID >= 0: # -1 is a flag for 'do not change port'
+            # print('valve_ID')
+            # print(valve_ID)
+            # print('port_ID')
+            # print(port_ID)
+            skip = False
+            if type(port_ID) is not tuple:
+                if port_ID == -1:   # -1 is a flag for 'do not change port'
+                    skip = True
+            if not skip: 
                 self.changeValvePosition(valve_ID, port_ID)
 
     # ------------------------------------------------------------------------------------

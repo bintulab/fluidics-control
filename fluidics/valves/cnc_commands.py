@@ -2,8 +2,16 @@ import crccheck
 import struct
 
 def cmd_int(value):
-    return map(ord, struct.pack("i", int(value)))
-
+    '''In python2 it was necessary to apply ord to the outpur of struct.pack to get the integer representation instead of unicode. In python3, struct.pack gives integers by default not unicode.  so in place of `map(ord,stuff)` just use list(stuff)
+    see here: https://stackoverflow.com/questions/45269456/understanding-struct-pack-in-python-2-7-and-3-5
+    original command:
+    `return map(ord, struct.pack("i", int(value)))`
+    new command:
+    
+    '''
+    output = list(struct.pack("i", int(value)))
+    return output
+    
 def cmd_checksum(cmd):
     return crccheck.crc.Crc8DvbS2.calc(cmd)
 

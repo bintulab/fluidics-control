@@ -1,6 +1,7 @@
 import usb
 import crccheck
 from valves.autopicker import MockAutopicker
+import valves.cnc_commands as cnc_commands
 # import autopicker
 
 # class CNC(autopicker.MockAutopicker):
@@ -34,7 +35,9 @@ class CNC(MockAutopicker):
 
     def send(self, msg):
         assert len(msg) == 64
-        assert crccheck.crc.Crc8DvbS2.calc(map(ord, msg[:-1])) == ord(msg[-1])
+        #output = crccheck.crc.Crc8DvbS2.calc(map(ord, msg[:-1])) == ord(msg[-1])  # python2 version 
+        output = crccheck.crc.Crc8DvbS2.calc(list(msg[:-1])) == msg[-1]
+        assert output
         self.endpoint_out.write(msg)
         return self.receive()
 
