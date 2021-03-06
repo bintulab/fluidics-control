@@ -1,5 +1,11 @@
+import importlib.util
+spec = importlib.util.spec_from_file_location("setPath", "../sc_library/setPath.py")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
 import cnc_talk
 cnc = cnc_talk.MockCNC()
+cnc = cnc_talk.CNC()
 plate = cnc_talk.Plate(cnc)
 plate.record_well()
 cnc.set((8, 12, 0))

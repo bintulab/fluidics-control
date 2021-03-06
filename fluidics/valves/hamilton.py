@@ -15,7 +15,7 @@
 import sys
 import time
 
-from storm_control.fluidics.valves.valve import AbstractValve
+from fluidics.valves.valve import AbstractValve
 
 # ----------------------------------------------------------------------------------------
 # HamiltonMVP Class Definition

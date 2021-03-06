@@ -6,11 +6,11 @@ import valves.cnc_commands as cnc_commands
 
 # class CNC(autopicker.MockAutopicker):
 class CNC(MockAutopicker):
-    def __init__(self, idVendor=0x2121, idProduct=0x2130, configuration=(0,0)):
+    def __init__(self, idVendor=0xA720, idProduct=0xF803, configuration=(0,0)): # idVendor=0x2121, idProduct=0x2130, configuration=(0,0)): # 
         self.status = ("Initializing", False)
         # self.dev = usb.core.find(idVendor=idVendor, idProduct=idProduct)
         import usb.backend.libusb0
-        backend = usb.backend.libusb0.get_backend(find_library=lambda x: r'./windows_dll/libusb0.dll')
+        backend = usb.backend.libusb0.get_backend(find_library=lambda x: r'C:\Windows\System32\libusb0.dll')#'./windows_dll/libusb0.dll')#
         self.dev = usb.core.find(idVendor=idVendor, idProduct=idProduct, backend=backend)
         if self.dev:
             self.dev.set_configuration()
